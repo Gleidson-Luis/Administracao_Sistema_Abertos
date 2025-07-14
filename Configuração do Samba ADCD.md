@@ -225,7 +225,7 @@ Changed password ok
 ```
 34. Posso verificar a integridade desse arquivo de configuração do samba
 ```
-$ testparn
+$ testparm
 ```
 35. Posso verificar o funcionamento do domínio
 ```
