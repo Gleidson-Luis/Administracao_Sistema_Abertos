@@ -153,4 +153,155 @@ $ sudo systemctl status samba-ad-dc
 ```
 Apresentando no Active: active (running), significa que está rodando.
 
-Fim da documentação
+25. O protocolo Kerberos que faz com que os horarios do AD sejam sicronizados para comunicar as maquinas no tempo de maneira adequada. Para garantir a sincronização tem que configurar um servidor NTP (Network Time Protocols) e primeiro tem que alterar algumas permissões dos arquivos que já são criados juntos das bibliotecas instaladas
+```
+$ sudo apt-get update
+$ sudo chown root:_chrony /var/lib/samba/ntp_signd/
+# sudo chmod 750 /var/lib/samba/ntp_signd/
+```
+26. Alterar o arquivo de configuração para inserir os dados do servidor
+```
+$ sudo nano /etc/chrony/chrony.conf
+```
+No final do arquivo adicionar as seguintes linhas
+```
+bindcmdaddress 192.168.10.2
+allow 192.168.10.0/24
+ntpsigndsocket /var/lib/samba/ntp_signd
+```
+Salvar o arquivo
+
+27. Reiniciar o serviço do Chrony
+```
+$ sudo systemctl restart chronyd
+```
+28. Verificar o status
+```
+$ sudo systemctl status chronyd
+```
+Active: running, está ok
+
+29. Verificar o host do samba
+```
+$ host -t A samba.local
+$ host -t A dc.samba.local
+```
+Os 3 IPs tem que está respondendo e tudo funcionando
+
+30. Verificar se os registros Kerberos
+```
+$ host -t SRV _kerberos._udp.samba.local
+$ host -t SRV _ldap._tcp.samba.local
+```
+31. Verificar os recursos padrões que estarão disponíveis no samba
+```
+$ smbcliente -L samba.local -N
+```
+Vai mostrar os usuários que estão no samba
+
+32. Verificar a autenticidade do kerberos
+```
+$ kinit administrator@SAMBA.LOCAL
+```
+Digita a senha do servidor
+```
+$ klist
+```
+Lista todos os usuários
+
+33. Fazer o login no servidor através do SMB
+```
+$ sudo smbclient //localhost/netlogon -U 'administrator'
+Password for [SAMBA\administrator]:
+```
+smb:\>
+Agora consegue acessar o smb
+Podendo alterar a senha do administrador
+```
+$ sudo samba-tool user setpassword administrator
+New Password:
+Retype Password:
+Changed password ok
+```
+34. Posso verificar a integridade desse arquivo de configuração do samba
+```
+$ testparn
+```
+35. Posso verificar o funcionamento do domínio
+```
+$ sudo samba-tool domain level show
+```
+36. Posso criar um usuário no samba
+```
+$ sudo samba-tool user create (nome do usuario)
+New Password:
+Retype Password:
+```
+37. Posso ver a lista de usuários
+```
+$ sudo samba-tool user list
+```
+38. Posso excluir usuários
+```
+$ sudo samba-tool user delete (nome do usuario)
+```
+39. Posso listar os computadores
+```
+$ sudo samba-tool computer list
+```
+40. Posso remorer computadores
+```
+$ sudo samba-tool computer delete (nome do computador)
+```
+41. Posso criar grupos
+```
+$ sudo samba-tools group add (nome do grupo)
+```
+42. Para listar os grupos
+```
+$ sudo samba-tool group list
+```
+43. Posso remover grupos, atribuir membros aos grupos e listar os membros desses grupos
+```
+$ samba-toll group limembers (nome do grupo)
+```
+Adicionar
+```
+$ sudo samba-tool group addmembers (nome do grupo) (nome do usuário)
+```
+Listar membros do grupo
+```
+$ sudo samba-tool group listmembers (nome do grupo)
+```
+Eliminar membros
+```
+$ sudo samba-tool troup removemembers (nome do grupo) (nome do usuário)
+```
+44. Atrelar um computador ao AD
+44.1. Abrir a máquina windows e verificar primeiro se está enchergando o domínio abrindo o CMD
+```
+ping 192.168.10.2
+```
+Verificar também o samba.local
+```
+ping samba.local
+```
+Não havendo resposta vai nas configurações de rede e internet no windows > Ethernet> Alterar opões de adaptador.
+Botão direito do mouse > Propriedades > Protocolo IP Versão 4 (TCP/IPv4) > Propriedades e inserir o IP [192.168.10.2] no servidor DNS Preferencial e no Gateway padrão.
+Fechar tudo e voltar ao CMD e pingar
+```
+ping samba.local
+```
+Se pingar está resolvido.
+
+# Para manter uma boa organização
+
+45. Alterar o nome do computador (Na máquina windows), digitar na barra de pesquisa: "grupo de trabalho" e clicar em "Alterar nome do grupo de trabalho". Ja nela que abrir alterar primeiro o nome do computador para: "Cliente-Windows" e reinicia a máquina windows.
+
+46. Após reiniciar voltar para "Alterar nome do grupo de trabalho" e selecionar "Domínio" para inserir o nosso domínio: samba.local. Vai abrir uma janela solicitando as credenciais Login: administrator e Senha: (do servidor samba), estando tudo ok, ele vai aparecer uma mensagem informando que entrou no domínio. Vai reiniciar a máquina windows
+
+47. Após reiniciar será possível entar pc usando o usuário cadastrado no servidor samba, onde na tela de login clica em "Entrar com outro domínio" > Usuário: samba.loca\(usuário) e digita a senha criada para esse usuário.
+
+Estando tudo ok ele vai acessar o usuário no samba ingressando essa máquina windows em um servidor samba.
+
+Fim da documentação.
