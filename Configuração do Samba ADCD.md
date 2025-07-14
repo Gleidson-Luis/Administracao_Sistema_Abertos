@@ -263,7 +263,7 @@ $ sudo samba-tool group list
 ```
 43. Posso remover grupos, atribuir membros aos grupos e listar os membros desses grupos
 ```
-$ samba-toll group limembers (nome do grupo)
+$ sudo samba-toll group limembers (nome do grupo)
 ```
 Adicionar
 ```
