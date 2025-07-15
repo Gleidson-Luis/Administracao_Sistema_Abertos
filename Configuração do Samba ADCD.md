@@ -195,7 +195,7 @@ $ host -t SRV _ldap._tcp.samba.local
 ```
 31. Verificar os recursos padrões que estarão disponíveis no samba
 ```
-$ smbcliente -L samba.local -N
+$ smbclient -L samba.local -N
 ```
 Vai mostrar os usuários que estão no samba
 
@@ -255,7 +255,7 @@ $ sudo samba-tool computer delete (nome do computador)
 ```
 41. Posso criar grupos
 ```
-$ sudo samba-tools group add (nome do grupo)
+$ sudo samba-tool group add (nome do grupo)
 ```
 42. Para listar os grupos
 ```
@@ -263,7 +263,7 @@ $ sudo samba-tool group list
 ```
 43. Posso remover grupos, atribuir membros aos grupos e listar os membros desses grupos
 ```
-$ sudo samba-toll group limembers (nome do grupo)
+$ sudo samba-tool group listmembers (nome do grupo)
 ```
 Adicionar
 ```
